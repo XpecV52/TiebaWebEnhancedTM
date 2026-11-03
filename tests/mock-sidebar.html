@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>mock tieba sidebar（按站点真实 CSS 复刻）</title>
+<style>
+  /* 以下数值全部取自 tb3.bdstatic.com/tb/pc/pc-main-core/static/css/index.*.css */
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: #0d0e10; color: #e6e8ec;
+    font: 14px/1.5 "PingFang SC", "Microsoft YaHei", sans-serif;
+  }
+  /* 真实布局骨架：.content-container 是 flex，.main-content 宽度写死 calc(100% - 260px) */
+  .pc-main-page-layout { overflow: hidden; }
+  .content-container { display: flex; align-items: stretch; width: 100%; height: 100vh; }
+  .main-content { width: calc(100% - 260px); display: flex; align-items: stretch; overflow: hidden; }
+  .feed { flex: 1; min-width: 0; background: #14161a; overflow: hidden; }
+  .right-side { width: 300px; flex: 0 0 300px; background: #14161a; overflow-y: auto; padding: 12px; }
+  .right-side h4 { margin: 8px 0; font-size: 13px; color: #8b909a; }
+  .right-side li { font-size: 12px; color: #c8ccd4; padding: 4px 0; list-style: none; }
+
+  .left-content {
+    position: relative; left: 0; z-index: 1002;
+    overflow-y: auto;
+    box-sizing: content-box; /* 站点是 content-box：240 + padding 20 = 实际 260 */
+    width: 240px;            /* 站点写死 */
+    height: 100%;
+    padding-left: 20px;      /* 站点写死 */
+    background: #121314;
+    border-right: 1px solid #232424;
+  }
+
+  .left-nav-wrapper { padding: 8px 8px 8px 0; }
+  .left-nav-wrapper .main { display: flex; flex-direction: column; gap: 2px; }
+  .left-nav-wrapper a.menu-item {
+    display: flex; align-items: center; gap: 12px; height: 54px;
+    padding: 0 16px; border-radius: 8px; color: #e6e8ec; text-decoration: none;
+    white-space: nowrap;
+  }
+  .left-nav-wrapper a.menu-item.active { background: #1d1f24; }
+  .left-nav-wrapper .item-icon { width: 20px; height: 20px; flex: 0 0 20px; fill: currentColor; }
+
+  /* 列表容器：站点写死 224px */
+  .list-container-wrapper.list-container-wrapper-nav { width: 224px; }
+  .list-container-wrapper .list-title-wrapper {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 22px 16px 8px;
+  }
+  .list-container-wrapper .list-title { color: #8b909a; font-weight: 500; font-size: 14px; }
+  .list-wrapper { display: flex; flex-direction: column; }
+  .list-container-wrapper .list-load-more {
+    display: flex; align-items: center;
+    width: calc(100% - 40px); min-height: 32px; padding: 10px 16px;
+    background: none; border: 1px solid rgba(255,255,255,.12); border-radius: 8px;
+    color: #8b909a; font-size: 14px; cursor: pointer;
+  }
+
+  /* 卡片：站点 padding 10px 16px */
+  a.forum-card-wrapper {
+    position: relative; display: flex; align-items: center;
+    padding: 10px 16px; user-select: none; color: #e6e8ec;
+    font-size: 14px; text-decoration: none;
+  }
+  a.forum-card-wrapper:hover { background-color: #1a1c21; }
+  .avatar-wrapper { position: relative; }
+  .avatar-wrapper .forum-avatar { flex-shrink: 0; width: 100%; height: 100%; border-radius: 8px; border: .6px solid #333; }
+
+  .forum-info-wrapper { flex: 1; overflow: hidden; }
+  .name-info-wrapper { display: flex; align-items: center; justify-content: space-between; }
+  .name-info { display: flex; align-items: center; overflow: hidden; }
+  .forum-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .forum-suffix { display: flex; align-items: center; }
+  .forum-suffix .level-icon {
+    display: inline-block; width: 17px; height: 15px; margin-top: -3px; margin-left: 4px;
+    background: #f0b429; border-radius: 3px; flex: 0 0 17px;
+  }
+  .forum-suffix .experience-tag {
+    font-size: 11px; color: #f0b429; margin-left: 3px; white-space: nowrap;
+  }
+  .feed { flex: 1; background: #14161a; }
+</style>
+</head>
+<body>
+<svg id="__SVG_SPRITE_NODE__" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+  <symbol id="sign_icon" viewBox="0 0 24 24"><path d="M4 13l5 5L20 6" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+</svg>
+<div class="pc-main-page-layout">
+<div class="content-container">
+  <div class="left-content">
+    <div class="left-nav-wrapper">
+      <div class="main">
+        <a class="menu-item active" href="#"><span>首页</span></a>
+        <a class="menu-item" href="#"><span>我的</span></a>
+      </div>
+    </div>
+    <div class="list-container-wrapper list-container-wrapper-nav" data-mock="hot"></div>
+    <div class="list-container-wrapper list-container-wrapper-nav" data-mock="follow"></div>
+  </div>
+  <div class="main-content">
+    <div class="feed"></div>
+    <div class="right-side">
+      <h4>最热热点</h4>
+      <ul><li>1 最热的关键节拍器</li><li>2 大神吧友速通</li><li>3 才艺表演核弹</li><li>4 吧友笑嘻</li><li>5 吧友破解版</li></ul>
+      <h4>最热的吧</h4>
+      <ul><li>1 孙笑川吧</li><li>2 deepseek吧</li><li>3 影之刃吧</li><li>4 盗版吧</li><li>5 抗压背锅吧</li></ul>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+  const HOT = ['幽灵行动断点吧', '杀戮间吧', '地球末日生存吧', '真三国无双吧', 'steam吧', '战国无双吧',
+    '幽灵行动荒野吧', 'borderlands吧', '无双大蛇吧', '雪地奔驰吧', '地球防卫军吧', '使命召唤吧',
+    '战地吧', '极限竞速地平线吧', '微软模拟飞行吧', '武装突袭吧', '战术小队吧', '叛乱沙漠风暴吧',
+    '逃离塔科夫吧', '狙击精英吧'];
+  const FOLLOW = Array.from({ length: 98 }, (_, i) => (i % 3 === 0 ? 'steam吧' : '关注的吧' + (i + 1)));
+
+  const AVATAR = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><rect width="32" height="32" fill="#4a6cf7"/></svg>');
+
+  function build(title, names, pageSize) {
+    const wrap = document.createElement('div');
+    wrap.className = 'list-container-wrapper list-container-wrapper-nav';
+    wrap.innerHTML =
+      '<div class="list-title-wrapper"><span class="list-title">' + title + '</span></div>' +
+      '<div class="list-wrapper"></div>' +
+      '<button class="list-load-more">展开全部</button>';
+    const list = wrap.querySelector('.list-wrapper');
+    const more = wrap.querySelector('.list-load-more');
+    let shown = 0;
+
+    // 完全按站点模板：avatar-wrapper(内联 32px) > img.forum-avatar
+    //   forum-info-wrapper > name-info-wrapper > name-info > (forum-name + forum-suffix)
+    function card(name) {
+      const a = document.createElement('a');
+      a.className = 'forum-card-wrapper';
+      a.href = '/f?kw=' + encodeURIComponent(name);
+      a.innerHTML =
+        '<div class="avatar-wrapper" style="width:32px;height:32px">' +
+        '<img class="forum-avatar" src="' + AVATAR + '">' +
+        '</div>' +
+        '<div class="forum-info-wrapper">' +
+        '<div class="name-info-wrapper">' +
+        '<div class="name-info">' +
+        '<div class="forum-name" style="font-size:14px">' + name + '</div>' +
+        '<div class="forum-suffix">' +
+        '<i class="level-icon"></i><span class="experience-tag">Lv.12</span>' +
+        '</div>' +
+        '</div>' +
+        '</div>' +
+        '</div>';
+      return a;
+    }
+    function addPage() {
+      const end = Math.min(shown + pageSize, names.length);
+      for (let i = shown; i < end; i += 1) list.appendChild(card(names[i]));
+      shown = end;
+      if (shown >= names.length) more.remove();
+    }
+    more.addEventListener('click', () => setTimeout(addPage, 60));
+    addPage();
+    return wrap;
+  }
+
+  document.querySelector('[data-mock="hot"]').replaceWith(build('我常逛的吧', HOT, 5));
+  document.querySelector('[data-mock="follow"]').replaceWith(build('我关注的吧', FOLLOW, 10));
+</script>
+<script src="../tieba-new-enhance.user.js"></script>
+</body>
+</html>

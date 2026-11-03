@@ -2,3 +2,5 @@
 probes/
 tools/
 *.png
+.cdp-profile/
+.cdp-profile*/
